@@ -2,16 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use App\Http\Resources\PostResource;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
-use App\Http\Resources\PostResource;
-use App\Models\Post;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Repositories\Post\PostRepositoryInterface;
 
 class PostController extends Controller
 {
+
+
+        /**
+     * @var PostRepositoryInterface|\App\Repositories\Repository
+     */
+    protected $postRepo;
+
+    public function __construct(PostRepositoryInterface $postRepo)
+    {
+        $this->postRepo = $postRepo;
+    }
+
     /**
      * Display a listing of the resource.
      * @return ResourceCollection
@@ -19,7 +32,7 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $pageSize = $request->page_size ?? 20;
-        $posts = Post::query()->paginate($pageSize);
+        $posts = $this->postRepo->getAll($pageSize);
         return PostResource::collection($posts);
     }
 
@@ -28,16 +41,11 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-       $created =  DB::transaction(function () use ($request) {
-            $created = Post::query()->create([
-                'title' => $request->title,
-                'body' => $request->body,
-            ]);
-
-            $created->users()->sync($request->user_ids);
-
-            return $created;
-        });
+       $created = $this->postRepo->create($request->only([
+        'title',
+        'body',
+        'user_ids',
+       ]));
 
         return new PostResource($created);
     }
@@ -45,25 +53,26 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show($id)
     {
+        $post =  $this->postRepo->find($id);
         return new PostResource($post);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Post $post)
+    public function update(Request $request, $id)
     {
-        $updated = $post->update([
-            'title' => $request->title ?? $post->title,
-            'body' => $request->body ?? $post->body,
-        ]);
+        $updated = $this->postRepo->update($id, $request->only([
+            'title',
+            'body',
+        ]));
 
-        if (!$updated){
+        if (!$updated) {
             return new JsonResponse([
                 'errors' => [
-                    'Failed to update model. '
+                    'Update Post failed'
                 ]
             ], 400);
         }
