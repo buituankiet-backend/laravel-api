@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\GeneralJsonException;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -47,6 +48,8 @@ class PostController extends Controller
         'user_ids',
        ]));
 
+       throw_if(!$created, GeneralJsonException::class, 'Failed creating resource');
+
         return new PostResource($created);
     }
 
@@ -69,13 +72,7 @@ class PostController extends Controller
             'body',
         ]));
 
-        if (!$updated) {
-            return new JsonResponse([
-                'errors' => [
-                    'Update Post failed'
-                ]
-            ], 400);
-        }
+        throw_if(!$updated, GeneralJsonException::class, 'Can not update');
 
         return new PostResource($updated);
     }
@@ -87,13 +84,8 @@ class PostController extends Controller
     {
         $delete = $post->forceDelete();
 
-        if (!$delete) {
-            return new JsonResponse([
-                'errors' => [
-                    'Could not delete resource.'
-                ]
-            ], 400);
-        }
+        throw_if(!$delete, GeneralJsonException::class, 'Can not delete');
+
         return new PostResource($delete);
     }
 }
