@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\GeneralJsonException;
-use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -80,12 +79,9 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy($id)
     {
-        $delete = $post->forceDelete();
-
-        throw_if(!$delete, GeneralJsonException::class, 'Can not delete');
-
+        $delete = $this->postRepo->delete($id);
         return new PostResource($delete);
     }
 }

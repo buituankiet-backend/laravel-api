@@ -30,12 +30,12 @@ interface RepositoryInterface
      * @param array $attributes
      * @return mixed
      */
-    public function update($model, array $attributes);
+    public function update($id, array $attributes);
 
     /**
      * Delete
      * @param $id
      * @return mixed
      */
-    public function delete($model);
+    public function delete($id);
 }

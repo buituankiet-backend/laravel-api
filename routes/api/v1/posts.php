@@ -15,15 +15,13 @@ Route::middleware([
             ->name('index')
             ->withoutMiddleware('auth');
 
-        Route::get('/{post}', [PostController::class, 'show'])->name('show')
+        Route::get('/{id}', [PostController::class, 'show'])->name('show')
 //            ->where('user', '[0-9]+');
                 ->whereNumber('post');
 
         Route::post('', [PostController::class, 'store'])->name('store');
 
-        Route::patch('/{post}', [PostController::class, 'update'])->name('update');
+        Route::patch('/{id}', [PostController::class, 'update'])->name('update');
 
-        Route::delete('/{post}', [PostController::class, 'destroy'])->name('destroy');
+        Route::delete('/{id}', [PostController::class, 'destroy'])->name('destroy');
     });
-
-

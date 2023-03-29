@@ -14,8 +14,8 @@ class GeneralJsonException extends Exception
     public function render($request) {
         return new JsonResponse([
             'errors' => [
-                'message' => $request->getMessage(),
+                'message' => $this->getMessage(),
             ]
-            ], $request -> code);
+            ], $this -> code ? $this->code : 400);
     }
 }

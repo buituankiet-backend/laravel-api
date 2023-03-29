@@ -5,7 +5,9 @@ namespace api;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommentController;
 
-Route::middleware('auth')
+Route::middleware([
+    
+])
     ->prefix('comments/')
     ->name('comments.')
     ->group(function (){
@@ -21,5 +23,3 @@ Route::middleware('auth')
 
         Route::delete('{comment}', [CommentController::class, 'destroy'])->name('destroy');
     });
-
-

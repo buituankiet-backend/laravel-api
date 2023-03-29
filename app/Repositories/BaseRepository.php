@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\GeneralJsonException;
 use App\Repositories\RepositoryInterface;
 
 abstract class BaseRepository implements RepositoryInterface
@@ -34,6 +35,8 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $result = $this->model->find($id);
 
+        throw_if(!$result, GeneralJsonException::class, 'Not found', 400);
+
         return $result;
     }
 
@@ -42,8 +45,7 @@ abstract class BaseRepository implements RepositoryInterface
         return $this->model->create($attributes);
     }
 
-    public function update($id, $attributes = [])
-    {
+    public function update($id, array $attributes){
         $result = $this->find($id);
         if ($result) {
             $result->delete();
@@ -59,7 +61,6 @@ abstract class BaseRepository implements RepositoryInterface
         $result = $this->find($id);
         if ($result) {
             $result->delete();
-
             return true;
         }
 
