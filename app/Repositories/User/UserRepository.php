@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories\User;
 
+use App\Events\Models\EventsUser;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Repositories\BaseRepository;
@@ -15,7 +16,6 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     }
 
     public function create($attributes = []) {
-        dd($attributes);
         return DB::transaction(function () use ($attributes) {
             $created = User::query()->create([
                 'name'  => data_get($attributes, 'name'),
@@ -24,6 +24,8 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             ]);
 
             throw_if(!$created, GeneralJsonException::class, 'Failed to create model.');
+
+            event(new EventsUser($created));
 
             return $created;
         });
@@ -38,6 +40,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'email' => data_get($attributes, 'email', $user->email),
             ]);
             throw_if(!$update, GeneralJsonException::class, 'Can not update user.');
+            event(new EventsUser($update));
             return $user;
         });
     }
@@ -48,6 +51,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             throw_if(!$user, GeneralJsonException::class, 'Not find user.');
             $delete = $user -> forceDelete();
             throw_if(!$delete, GeneralJsonException::class, 'Can not delete user.');
+            event(new EventsUser($delete));
             return $delete;
         });
     }

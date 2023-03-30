@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Events\Models\EventsUser;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Repositories\User\UserRepositoryInterface;
-use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -27,6 +28,7 @@ class UserController extends Controller
      */
     public function index()
     {
+        event(new EventsUser(User::factory()->make()));
         return new JsonResponse(User::query()->paginate(5));
     }
 
@@ -35,8 +37,6 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-
-        dd($request -> email);
         $created = $this->userRepository->create([
             'email' => $request->email,
             'password' => $request->password,
