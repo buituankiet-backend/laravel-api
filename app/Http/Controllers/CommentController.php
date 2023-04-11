@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Resources\CommentResource;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
@@ -69,5 +70,9 @@ class CommentController extends Controller
     {
         $comment = $this->commentRepository->delete($id);
         return new CommentResource($comment);
+    }
+
+    public function test() {
+        return Response::json('hee');
     }
 }
